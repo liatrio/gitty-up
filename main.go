@@ -28,13 +28,15 @@ func createManifest(ext string) (valueManifestInterface, error) {
 	switch ext {
 	case "hcl":
 		return &manifestHcl{}, nil
+	case "json":
+		return &manifestJSON{}, nil
 	default:
 		return nil, fmt.Errorf("Unhandled manifest type '%s'", ext)
 	}
 }
 
 func openManifestFile(file string) (manifest valueManifestInterface, err error) {
-	fmt.Printf("Opening manifest file %s", file)
+	fmt.Printf("Opening manifest file %s\n", file)
 
 	ext := strings.TrimLeft(path.Ext(file), ".")
 
@@ -43,8 +45,8 @@ func openManifestFile(file string) (manifest valueManifestInterface, err error) 
 		return
 	}
 
-	manifest.open(file)
-
+	err = manifest.open(file)
+	
 	return
 }
 

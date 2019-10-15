@@ -15,8 +15,8 @@ type manifestHcl struct {
 	astFile *ast.File
 }
 
-func (h *manifestHcl) open(file string) (err error) {
-	h.file = file
+func (m *manifestHcl) open(file string) (err error) {
+	m.file = file
 
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -24,7 +24,7 @@ func (h *manifestHcl) open(file string) (err error) {
 	}
 
 	fmt.Println("Decoding HCL data")
-	h.astFile, err = hcl.Parse(string(contents))
+	m.astFile, err = hcl.Parse(string(contents))
 	if err != nil {
 		return
 	}
@@ -32,10 +32,10 @@ func (h *manifestHcl) open(file string) (err error) {
 	return
 }
 
-func (h *manifestHcl) setValue(path []string, value interface{}) error {
-	fmt.Printf("Changing value of %v\n", path)
+func (m *manifestHcl) setValue(path []interface{}, value interface{}) error {
+	fmt.Printf("Setting value of %v: %v\n", path, value)
 	matched := false
-	ast.Walk(h.astFile.Node, func(n ast.Node) (ast.Node, bool) {
+	ast.Walk(m.astFile.Node, func(n ast.Node) (ast.Node, bool) {
 		if item, ok := n.(*ast.ObjectItem); ok {
 			for _, key := range item.Keys {
 				if key.Token.Type.IsIdentifier() && key.Token.Text == path[0] {
@@ -64,14 +64,14 @@ func (h *manifestHcl) setValue(path []string, value interface{}) error {
 
 }
 
-func (h *manifestHcl) save() (err error) {
-	file, err := os.Create(h.file)
+func (m *manifestHcl) save() (err error) {
+	file, err := os.Create(m.file)
 	if err != nil {
 		return
 	}
 
 	defer file.Close()
-	err = printer.Fprint(file, h.astFile.Node)
+	err = printer.Fprint(file, m.astFile.Node)
 
 	return
 }

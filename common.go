@@ -6,12 +6,12 @@ import (
 
 type valueManifestInterface interface {
 	open(path string) error
-	setValue(path []string, value interface{}) error
+	setValue(path []interface{}, value interface{}) error
 	save() error
 }
 
 type valuePath struct {
-	path  []string
+	path  []interface{}
 	value interface{}
 }
 
@@ -20,7 +20,12 @@ func parseValues(values string) ([]valuePath, error) {
 	valueMapList := make([]valuePath, len(items))
 	for index, item := range items {
 		keyvalue := strings.Split(item, "=")
-		valueMapList[index] = valuePath{strings.Split(keyvalue[0], "."), keyvalue[1]}
+		crumbs := strings.Split(keyvalue[0], ".")
+		path := make([]interface{}, len(crumbs))
+		for k, v := range crumbs {
+			path[k] = v
+		}
+		valueMapList[index] = valuePath{path, keyvalue[1]}
 	}
 	return valueMapList, nil
 }

@@ -43,7 +43,7 @@ func TestHclManifestSetValue(t *testing.T) {
 	}
 
 	hclManifest := &manifestHcl{"", astFile}
-	hclManifest.setValue([]string{"one", "two"}, "bar")
+	hclManifest.setValue([]interface{}{"one", "two"}, "bar")
 
 	assert.Equal(t, "\"bar\"", value.Token.Text)
 }

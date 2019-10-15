@@ -54,8 +54,8 @@ func TestParseValues(t *testing.T) {
 
   assert.Nil(t, err)
 
-  assert.Equal(t, valuePath[0].path[0], "input")
-  assert.Equal(t, valuePath[0].path[1], "one")
+  assert.Equal(t, valuePath[0].path[0].(string), "input")
+  assert.Equal(t, valuePath[0].path[1].(string), "one")
   assert.Equal(t, valuePath[0].value.(string), "foo")
 }
 

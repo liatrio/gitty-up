@@ -11,7 +11,7 @@ import (
 
 type manifestJSON struct {
 	file string
-	jsonObj interface{}
+	data interface{}
 }
 
 func (m *manifestJSON) open(file string) (err error) {
@@ -25,7 +25,7 @@ func (m *manifestJSON) open(file string) (err error) {
 	decoder := json.NewDecoder(f)
 
 	for {
-		err := decoder.Decode(&m.jsonObj)
+		err := decoder.Decode(&m.data)
 		if err == io.EOF {
 			break;
 		}
@@ -39,7 +39,7 @@ func (m *manifestJSON) open(file string) (err error) {
 
 func (m *manifestJSON) setValue(path []interface{}, value interface{}) (error) {
 	fmt.Printf("Setting value %v: %v\n", path, value)
-	return walk(&m.jsonObj, path, value)
+	return walk(&m.data, path, value)
 }
 
 func (m *manifestJSON) save() (err error) {
@@ -52,7 +52,7 @@ func (m *manifestJSON) save() (err error) {
 	encoder := json.NewEncoder(f)
 
 	encoder.SetIndent("", "  ")
-	err = encoder.Encode(m.jsonObj);
+	err = encoder.Encode(m.data);
 	if err != nil {
 		return fmt.Errorf("Error encoding JSON to file: %s", err)
 	}

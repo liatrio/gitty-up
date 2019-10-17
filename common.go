@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-type valueManifestInterface interface {
+type manifestInterface interface {
 	open(path string) error
 	setValue(path []interface{}, value interface{}) error
 	save() error

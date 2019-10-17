@@ -9,12 +9,11 @@ import (
 
 )
 
-// func TestManifestInterface(t *testing.T) {
-// 	manifest := manifestJSON{}
+func TestManifestJSONInterface(t *testing.T) {
+	manifest := new(manifestJSON)
 
-// 	// assert.True(t, manifest.(valueManifestInterface))
-// 	assert.Implements(t, new(valueManifestInterface), manifest)
-// }
+	assert.Implements(t, (*manifestInterface)(nil), manifest)
+}
 
 func TestManifestJSONOpen(t *testing.T) {
 	file, err := ioutil.TempFile("", "test_json_open")
@@ -30,8 +29,8 @@ func TestManifestJSONOpen(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, manifest.file, file.Name())
-	assert.IsType(t, make(map[string]interface{}), manifest.jsonObj)
-	assert.Equal(t, manifest.jsonObj.(map[string]interface{})["inputs"].(map[string]interface{})["one"], "bar")
+	assert.IsType(t, make(map[string]interface{}), manifest.data)
+	assert.Equal(t, manifest.data.(map[string]interface{})["inputs"].(map[string]interface{})["one"], "bar")
 }
 
 func TestManifestJSONSetValue(t *testing.T) {

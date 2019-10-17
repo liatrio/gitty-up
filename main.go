@@ -24,18 +24,20 @@ func CheckIfError(err error) {
 	os.Exit(1)
 }
 
-func createManifest(ext string) (valueManifestInterface, error) {
+func createManifest(ext string) (manifestInterface, error) {
 	switch ext {
 	case "hcl":
 		return &manifestHcl{}, nil
 	case "json":
 		return &manifestJSON{}, nil
+	case "yaml":
+		return &manifestYaml{}, nil
 	default:
 		return nil, fmt.Errorf("Unhandled manifest type '%s'", ext)
 	}
 }
 
-func openManifestFile(file string) (manifest valueManifestInterface, err error) {
+func openManifestFile(file string) (manifest manifestInterface, err error) {
 	fmt.Printf("Opening manifest file %s\n", file)
 
 	ext := strings.TrimLeft(path.Ext(file), ".")

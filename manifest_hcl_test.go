@@ -12,6 +12,12 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 )
 
+func TestManifestHclInterface(t *testing.T) {
+	manifest := new(manifestHcl)
+
+	assert.Implements(t, (*manifestInterface)(nil), manifest)
+}
+
 func TestHclManifestOpen(t *testing.T) {
 	// Create HCL file to test
 	file, err := ioutil.TempFile("", "test_hcl")

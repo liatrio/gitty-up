@@ -3,10 +3,9 @@ package main
 import (
 	"testing"
 	"io/ioutil"
-	"os"
+	"strings"
 
 	"github.com/stretchr/testify/assert"
-
 )
 
 func TestManifestJSONInterface(t *testing.T) {
@@ -16,57 +15,43 @@ func TestManifestJSONInterface(t *testing.T) {
 }
 
 func TestManifestJSONOpen(t *testing.T) {
-	file, err := ioutil.TempFile("", "test_json_open")
-	if err != nil {
-		t.Errorf("Test setup failed. Could not create test_json_open file: %s", err)
-	}
-	defer os.Remove(file.Name())
-	file.WriteString("{\"inputs\": {\"one\": \"bar\"}}")
-	file.Close()
 
-	manifest := &manifestJSON{}
-	err = manifest.open(file.Name())
+	manifest := manifestJSON{}
+	err := manifest.open("./sample/sample_a.json")
+	assert.NoError(t, err)
 
-	assert.Nil(t, err)
-	assert.Equal(t, manifest.file, file.Name())
-	assert.IsType(t, make(map[string]interface{}), manifest.data)
-	assert.Equal(t, manifest.data.(map[string]interface{})["inputs"].(map[string]interface{})["one"], "bar")
+	assert.Equal(t, "v0.1.1", manifest.data.(map[string]interface{})["one"].(map[string]interface{})["magenta"])
 }
 
 func TestManifestJSONSetValue(t *testing.T) {
-	jsonObj := &map[string]interface{}{"one": map[string]interface{}{"two": "foo"}}
-	// jsonObj := &map[string]map[string]string{}
-	path := []interface{}{"one", "two"}
+	manifest := manifestJSON{}
+	manifest.data = map[string]interface{}{"one": map[string]interface{}{"cyan": "v0.0.1", "magenta": "v0.1.1"}, "two": map[string]interface{}{"yellow": "v0.2.1", "black": "v0.3.1"}}
 
-	// (*jsonObj)["one"] = map[string]string{"two": "foo"}
+	err := manifest.setValue([]interface{}{"one", "magenta"}, "v0.0.42")
+	assert.NoError(t, err)
 
-	manifest := &manifestJSON{"", *jsonObj}
-	err := manifest.setValue(path, "bar")
-
-	value := (*jsonObj)["one"].(map[string]interface{})["two"]
-	assert.Nil(t, err)
-	assert.Equal(t, "bar", value)
+	assert.Equal(t, "v0.0.42", manifest.data.(map[string]interface{})["one"].(map[string]interface{})["magenta"])
 }
 
 func TestManifestJSONSave(t *testing.T) {
 	file, err := ioutil.TempFile("", "test_json_save")
-	if err != nil {
-		t.Errorf("Test setup failed. Could not create test_json_save")
-	}
-	defer os.Remove(file.Name())
+	assert.NoError(t, err)
 	file.Close()
 
-	jsonObj := &map[string]interface{}{"one": map[string]interface{}{"two": "foo"}}
-	
-	manifest := &manifestJSON{file.Name(), jsonObj}
+	manifest := manifestJSON{}
+	manifest.file = file.Name()
+	manifest.data = map[string]interface{}{"one": map[string]interface{}{"cyan": "v0.0.1", "magenta": "v0.1.1"}, "two": map[string]interface{}{"yellow": "v0.2.1", "black": "v0.3.1"}}
 
 	err = manifest.save();
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
-	contents, err := ioutil.ReadFile(file.Name())
-	if err != nil {
-		t.Error("Test setup failed. Could not read output file")
-	}
-	assert.FileExists(t, file.Name())
-	assert.Equal(t, "{\n  \"one\": {\n    \"two\": \"foo\"\n  }\n}\n", string(contents))
+	expected, err := ioutil.ReadFile("./sample/sample_a.json")
+	assert.NoError(t, err)
+
+	actual, err := ioutil.ReadFile(file.Name())
+	assert.NoError(t, err)
+
+	// assert.Equal(t, expected, actual)
+	assert.Less(t, 0, len(strings.TrimSpace(string(actual))))
+	assert.Equal(t, len(strings.TrimSpace(string(expected))), len(strings.TrimSpace(string(actual))))
 }

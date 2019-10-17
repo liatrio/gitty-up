@@ -36,7 +36,6 @@ func (m *manifestYaml) open(file string) (err error) {
 func (m *manifestYaml) setValue(path []interface{}, value interface{}) (err error) {
 	fmt.Printf("Setting value %v: %v\n", path, value)
 	return walk(&m.data, path, value)
-
 }
 
 func (m *manifestYaml) save() (err error) {

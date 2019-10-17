@@ -2,12 +2,10 @@ package main
 
 import (
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	_ "github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 	"github.com/hashicorp/hcl/hcl/token"
 )
@@ -19,21 +17,12 @@ func TestManifestHclInterface(t *testing.T) {
 }
 
 func TestHclManifestOpen(t *testing.T) {
-	// Create HCL file to test
-	file, err := ioutil.TempFile("", "test_hcl")
-	if err != nil {
-		t.Errorf("Test setup failed. Could not create 'test_hcl' file: %s", err)
-	}
-	defer os.Remove(file.Name())
-	file.WriteString("inputs = {\n  one = \"bar\"\n}")
-	file.Close()
+	manifest := &manifestHcl{}
+	err := manifest.open("./sample/sample_a.hcl")
+	assert.NoError(t, err)
 
-	hclManifest := &manifestHcl{}
-	err = hclManifest.open(file.Name())
-
-	assert.Nil(t, err)
-	assert.Equal(t, hclManifest.file, file.Name())
-	assert.NotNil(t, hclManifest.astFile)
+	assert.NotNil(t, manifest.astFile)
+	assert.Equal(t, "\"v0.1.1\"", manifest.astFile.Node.(*ast.ObjectList).Items[0].Val.(*ast.ObjectType).List.Items[1].Val.(*ast.LiteralType).Token.Text)
 }
 
 func TestHclManifestSetValue(t *testing.T) {
@@ -66,15 +55,14 @@ func TestHclManifestSave(t *testing.T) {
 		},
 	}
 	file, err := ioutil.TempFile("", "test_hcl")
-	if err != nil {
-		t.Errorf("Test setup failed. Could not create 'test_hcl' file: %s", err)
-	}
-	defer os.Remove(file.Name())
+	assert.NoError(t, err)
 
 	hclManifest := &manifestHcl{file.Name(), astFile}
-	hclManifest.save()
+	err = hclManifest.save()
+	assert.NoError(t, err)
 
 	contents, err := ioutil.ReadFile(file.Name())
+	assert.NoError(t, err)
 	assert.FileExists(t, file.Name())
 	assert.NotEmpty(t, contents)
 }

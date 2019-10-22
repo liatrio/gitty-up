@@ -24,8 +24,5 @@ jobs:
             dep ensure
         fi
 
-    - name: gndn
-      run: pwd
-
     - name: Test
-      run: go test gitops -cover -v
+      run: go test -cover -v

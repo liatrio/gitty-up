@@ -26,16 +26,3 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
-dockers:
-  -
-    goos: linux
-    goarch: amd64
-    goarm: ''
-    binaries: 
-    - gitops-manifest-updater
-    image_templates:
-    - liatrio/gitops-manifest-updater
-    dockerfile: Dockerfile
-    extra_files:
-    - sample
-    - .

@@ -17,6 +17,7 @@ jobs:
     - name: Build and push the Docker image
       run: |
         export VERSION=$(git describe --tags)
+        docker build . --file Dockerfile --tag $NAME:latest
         docker build . --file Dockerfile --tag $NAME:$VERSION
         docker login --username ${{ secrets.DockerHubUsername  }} --password ${{ secrets.DockerHubPassword }}
         docker push $NAME:latest

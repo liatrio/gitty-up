@@ -1,4 +1,4 @@
-# Gitops Builder Image
+# Gitty Up 
 The gitops builder image contains a script written in golang that can parse and edit HCL files in a specified repository and then commit the changes and trigger a PR in that same repository
 
 ### Environment Variables

@@ -1,20 +1,20 @@
 pipeline {
-    agent any
+    agent {
+        label "lead-toolchain-goreleaser"
+    }
     stages {
         stage('Test') {
-            agent {
-                label "lead-toolchain-goreleaser"
-            }
             steps {
-                sh 'go test'
+                container('goreleaser') {
+                    sh 'go test'
+                }
             }
         }
         stage('Build and Release') {
-            agent {
-                label "lead-toolchain-goreleaser"
-            }
             steps {
-                sh 'goreleaser release'
+                container('goreleaser') {
+                    sh 'goreleaser release'
+                }
             }
         }
     }

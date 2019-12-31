@@ -26,3 +26,8 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+brews:
+- name: gitty-up
+  github:
+    owner: liatrio
+    name: homebrew-tap

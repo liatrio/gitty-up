@@ -13,6 +13,7 @@ pipeline {
         stage('Build and Release') {
             steps {
                 container('goreleaser') {
+                    sh 'git fetch --tag'
                     sh 'goreleaser release'
                 }
             }

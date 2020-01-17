@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"io/ioutil"
 
 	"golang.org/x/oauth2"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
@@ -73,7 +74,6 @@ func main() {
 		"gitPassword",
 		os.Getenv("GITOPS_GIT_PASSWORD"),
 		"Password or token to authenticate with git. Can also use GITOPS_GIT_PASSWORD environment variable")
-	repoPath := "/home/jenkins/repo/"
 	repoFile := flag.String(
 		"repoFile",
 		os.Getenv("GITOPS_REPO_FILE"),
@@ -89,7 +89,10 @@ func main() {
 
 	flag.Parse()
 
-	filePath := repoPath + *repoFile
+	repoPath, err := ioutil.TempDir("", "gitty-up")
+	CheckIfError(err)
+
+	filePath := repoPath + "/" + *repoFile
 
 	fmt.Println("Start GitOps")
 

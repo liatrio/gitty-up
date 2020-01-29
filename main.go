@@ -94,8 +94,6 @@ func main() {
 
 	filePath := repoPath + "/" + *repoFile
 
-	fmt.Println("Start GitOps")
-
 	if *gitURL == "" {
 		usage("ERROR: Git URL is required!")
 	}

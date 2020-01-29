@@ -26,7 +26,7 @@ Most arguments can be set as flags or with environment variables.
 
 - `--gitUrl` | `GITOPS_GIT_URL` (required)
   - URL of git repository. Example: `https://github.com/my-org/my-repo` or `git@github.com/my-org/my-repo.git`
-- `--gitUsername` | `GITOPS_GIT_USERNAME`
+- `--gitUsername` | `GITOPS_GIT_USERNAME` (required)
   - Username to authenticate with git.
 - `--gitPassword` | `GITOPS_GIT_PASSWORD` (required)
   - Password or token to authenticate with git.

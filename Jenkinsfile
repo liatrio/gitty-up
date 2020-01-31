@@ -16,7 +16,6 @@ pipeline {
     stage('Build & Publish') {
       steps {
         container('goreleaser') {
-          sh 'git fetch --tag'
           withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
             script {
               sh "goreleaser release --parallelism=1 ${BRANCH_NAME != 'master' ? '--skip-publish' : ''}"
@@ -42,17 +41,17 @@ spec:
     command: ["/bin/sh", "-c"]
     args: ["cat"]
     tty: true
-    env:
-      - name: GITOPS_GIT_USERNAME
-        valueFrom:
-            secretKeyRef:
-                name: jenkins-credential-github
-                key: username
-      - name: GITOPS_GIT_PASSWORD
-        valueFrom:
-            secretKeyRef:
-                name: jenkins-credential-github
-                key: password
+    // env:
+      // - name: GITOPS_GIT_USERNAME
+      //   valueFrom:
+      //       secretKeyRef:
+      //           name: jenkins-credential-github
+      //           key: username
+      // - name: GITOPS_GIT_PASSWORD
+      //   valueFrom:
+      //       secretKeyRef:
+      //           name: jenkins-credential-github
+      //           key: password
 """
         }
       }
@@ -63,7 +62,11 @@ spec:
       }
       steps {
         container('gitty-up') {
-          sh '/gitops --dry-run'
+          withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+            script {
+              sh '/gitops --dry-run'
+            }
+          }
         }
       }
     }

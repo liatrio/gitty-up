@@ -62,7 +62,7 @@ spec:
       }
       steps {
         container('gitty-up') {
-          withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+          withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITOPS_GIT_USERNAME', passwordVariable: 'GITOPS_GIT_PASSWORD')]) {
             script {
               sh '/gitops --dry-run'
             }

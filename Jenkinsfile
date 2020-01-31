@@ -58,7 +58,7 @@ spec:
       environment {
         GITOPS_GIT_URL = "https://github.com/liatrio/gitty-up-manifest.git"
         GITOPS_REPO_FILE = "tools.json"
-        GITOPS_VALUES = "testing.gitty-up=0.0.42"
+        GITOPS_VALUES = "testing.gitty-up=${sh(returnStdout: true, script: 'gitty-up --version')}"
       }
       steps {
         container('gitty-up') {

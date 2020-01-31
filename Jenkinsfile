@@ -18,7 +18,7 @@ pipeline {
         container('goreleaser') {
           withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
             script {
-              sh "goreleaser release --parallelism=1 ${BRANCH_NAME != 'master' ? '--skip-publish' : ''}"
+              sh "goreleaser release ${BRANCH_NAME != 'master' ? '--skip-publish' : ''}"
             }
           }
         }

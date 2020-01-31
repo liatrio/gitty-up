@@ -15,6 +15,8 @@ import (
 
 )
 
+var version = "undefined"
+
 // CheckIfError should be used to naively panics if an error is not nil.
 func CheckIfError(err error) {
 	if err == nil {
@@ -62,68 +64,77 @@ func usage(message string) {
 }
 
 func main() {
-	gitURL := flag.String(
+	argGitURL := flag.String(
 		"gitUrl",
 		os.Getenv("GITOPS_GIT_URL"),
 		"URL of git repository. Can also use GITOPS_GIT_URL environment variable")
-	gitUsername := flag.String(
+	argGitUsername := flag.String(
 		"gitUsername",
 		os.Getenv("GITOPS_GIT_USERNAME"),
-		"Username to authenticate with git. Can also useGITOPS_GIT_USERNAME environment variable ")
-	gitPassword := flag.String(
+		"Username to authenticate with git. Can also use GITOPS_GIT_USERNAME environment variable ")
+	argGitPassword := flag.String(
 		"gitPassword",
 		os.Getenv("GITOPS_GIT_PASSWORD"),
 		"Password or token to authenticate with git. Can also use GITOPS_GIT_PASSWORD environment variable")
-	repoFile := flag.String(
+	argRepoFile := flag.String(
 		"repoFile",
 		os.Getenv("GITOPS_REPO_FILE"),
 		"File in git repo to apply changes to. Can also use GITOPS_REPO_FILE environment variable")
-	values := flag.String(
+	argValues := flag.String(
 		"values",
 		os.Getenv("GITOPS_VALUES"),
 		"List of variables and coresponding values to update. Variables paths are a list of keys separated with periods. Each variable is separated with a colon. Example '-values=input.one=foo:input.two=bar'. Can also use GITOPS_VALUES environment variable")
-	dryrun := flag.Bool(
+	argDryRun := flag.Bool(
 		"dry-run",
 		false,
 		"Turn on to disable making any changes to target repository")
+	flagVersion := flag.Bool(
+		"version",
+		false,
+		"Print version")
 
 	flag.Parse()
+
+	if *flagVersion {
+		fmt.Printf("Version: %s\n", version)
+		os.Exit(0)
+	}
 
 	repoPath, err := ioutil.TempDir("", "gitty-up")
 	CheckIfError(err)
 
-	filePath := repoPath + "/" + *repoFile
+	filePath := repoPath + "/" + *argRepoFile
 
-	if *gitURL == "" {
+	if *argGitURL == "" {
 		usage("ERROR: Git URL is required!")
 	}
 
-	if *gitUsername == "" || gitUsername == nil {
+	if *argGitUsername == "" || argGitUsername == nil {
 		usage("ERROR: Git username is required!")
 	}
 
-	if *gitPassword == "" || gitPassword == nil {
+	if *argGitPassword == "" || argGitPassword == nil {
 		usage("ERROR: Git password is required!")
 	}
 
-	if *repoFile == "" {
+	if *argRepoFile == "" {
 		usage("ERROR: File is required!")
 	}
 
-	if *values == "" {
+	if *argValues == "" {
 		usage("ERROR: Values are required!")
 	}
-	valuePaths, err := parseValues(*values)
+	valuePaths, err := parseValues(*argValues)
 	if err != nil {
 		usage("ERROR: Could not parse values")
 	}
 
 	gitAuth := &http.BasicAuth{
-		Username: *gitUsername,
-		Password: *gitPassword,
+		Username: *argGitUsername,
+		Password: *argGitPassword,
 	}
 
-	repo, err := gitClone(*gitURL, gitAuth, repoPath)
+	repo, err := gitClone(*argGitURL, gitAuth, repoPath)
 	CheckIfError(err)
 
 	branch, worktree, err := gitBranch(repo)
@@ -140,24 +151,24 @@ func main() {
 	err = manifest.save()
 	CheckIfError(err)
 
-	err = gitCommit(worktree, *repoFile)
+	err = gitCommit(worktree, *argRepoFile)
 	CheckIfError(err)
 
-	if *dryrun == false {
+	if *argDryRun == false {
 		err = gitPush(repo, gitAuth)
 		CheckIfError(err)
 	}
 
-	gitURLParts, err := url.Parse(*gitURL)
+	gitURLParts, err := url.Parse(*argGitURL)
 	CheckIfError(err)
 
 	if gitURLParts.Host == "github.com" {
-		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: *gitPassword})
+		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: *argGitPassword})
 		tokenClient := oauth2.NewClient(context.Background(), tokenSource)
 
 		pathParts := strings.Split(strings.TrimSuffix(gitURLParts.Path, ".git"), "/")
 
-		if *dryrun == false {
+		if *argDryRun == false {
 			pullRequest, err := githubPullRequest(tokenClient, pathParts[1], pathParts[2], branch)
 			CheckIfError(err)
 

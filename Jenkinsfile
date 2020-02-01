@@ -30,41 +30,27 @@ pipeline {
           yaml """
 apiVersion: v1
 kind: Pod
-metadata:
-  labels:
-    some-label: some-label-value
 spec:
   serviceAccountName: jenkins
   containers:
   - name: gitty-up
-    image: liatrio/gitty-up:latest
+    image: liatrio/gitty-up:0.1.3
     command: ["/bin/sh", "-c"]
     args: ["cat"]
     tty: true
-    // env:
-      // - name: GITOPS_GIT_USERNAME
-      //   valueFrom:
-      //       secretKeyRef:
-      //           name: jenkins-credential-github
-      //           key: username
-      // - name: GITOPS_GIT_PASSWORD
-      //   valueFrom:
-      //       secretKeyRef:
-      //           name: jenkins-credential-github
-      //           key: password
 """
         }
       }
       environment {
         GITOPS_GIT_URL = "https://github.com/liatrio/gitty-up-manifest.git"
         GITOPS_REPO_FILE = "tools.json"
-        GITOPS_VALUES = "testing.gitty-up=${sh(returnStdout: true, script: 'gitty-up --version')}"
+        // GITOPS_VALUES = "testing.gitty-up=${sh(returnStdout: true, script: 'gitty-up --version')}"
       }
       steps {
         container('gitty-up') {
           withCredentials([usernamePassword(credentialsId: 'jenkins-credential-github', usernameVariable: 'GITOPS_GIT_USERNAME', passwordVariable: 'GITOPS_GIT_PASSWORD')]) {
             script {
-              sh '/gitops --dry-run'
+              sh 'gitty-up --values=testing.gitty-up=$(gitty-up --version) --dry-run'
             }
           }
         }

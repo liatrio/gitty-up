@@ -1,12 +1,12 @@
 package main
 
 import (
-  _ "os"
-  "testing"
-  _ "reflect"
-  "github.com/stretchr/testify/assert"
-  _ "github.com/hashicorp/hcl"
-  _ "github.com/hashicorp/hcl/hcl/printer"
+	_ "github.com/hashicorp/hcl"
+	_ "github.com/hashicorp/hcl/hcl/printer"
+	"github.com/stretchr/testify/assert"
+	_ "os"
+	_ "reflect"
+	"testing"
 )
 
 // func TestDecodeHcl(t *testing.T) {
@@ -49,13 +49,12 @@ import (
 // }
 
 func TestParseValues(t *testing.T) {
-  values := "input.one=foo"
-  valuePath, err := parseValues(values)
+	values := "input.one=foo"
+	valuePath, err := parseValues(values)
 
-  assert.Nil(t, err)
+	assert.Nil(t, err)
 
-  assert.Equal(t, valuePath[0].path[0].(string), "input")
-  assert.Equal(t, valuePath[0].path[1].(string), "one")
-  assert.Equal(t, valuePath[0].value.(string), "foo")
+	assert.Equal(t, valuePath[0].path[0].(string), "input")
+	assert.Equal(t, valuePath[0].path[1].(string), "one")
+	assert.Equal(t, valuePath[0].value.(string), "foo")
 }
-

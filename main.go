@@ -4,15 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"path"
 	"strings"
-	"io/ioutil"
 
 	"golang.org/x/oauth2"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
-
 )
 
 // CheckIfError should be used to naively panics if an error is not nil.
@@ -31,7 +30,7 @@ func createManifest(ext string) (manifestInterface, error) {
 		return &manifestHcl{}, nil
 	case "json":
 		return &manifestJSON{}, nil
-	case "yaml":
+	case "yaml", "yml":
 		return &manifestYaml{}, nil
 	default:
 		return nil, fmt.Errorf("Unhandled manifest type '%s'", ext)
@@ -49,7 +48,7 @@ func openManifestFile(file string) (manifest manifestInterface, err error) {
 	}
 
 	err = manifest.open(file)
-	
+
 	return
 }
 

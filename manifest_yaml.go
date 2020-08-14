@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"io"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
@@ -49,6 +49,6 @@ func (m *manifestYaml) save() (err error) {
 	if err != nil {
 		return
 	}
-	
+
 	return
 }

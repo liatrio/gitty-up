@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
 	"io/ioutil"
 	"strings"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -42,7 +42,7 @@ func TestManifestJSONSave(t *testing.T) {
 	manifest.file = file.Name()
 	manifest.data = map[string]interface{}{"one": map[string]interface{}{"cyan": "v0.0.1", "magenta": "v0.1.1"}, "two": map[string]interface{}{"yellow": "v0.2.1", "black": "v0.3.1"}}
 
-	err = manifest.save();
+	err = manifest.save()
 	assert.NoError(t, err)
 
 	expected, err := ioutil.ReadFile("./sample/sample_a.json")

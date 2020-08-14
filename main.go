@@ -30,9 +30,7 @@ func createManifest(ext string) (manifestInterface, error) {
 		return &manifestHcl{}, nil
 	case "json":
 		return &manifestJSON{}, nil
-	case "yaml":
-		return &manifestYaml{}, nil
-	case "yml":
+	case "yaml", "yml":
 		return &manifestYaml{}, nil
 	default:
 		return nil, fmt.Errorf("Unhandled manifest type '%s'", ext)

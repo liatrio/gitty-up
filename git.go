@@ -2,16 +2,15 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"os"
 	"strings"
-		
+	"time"
+
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
-
 )
 
 func gitClone(url string, auth transport.AuthMethod, repoPath string) (*git.Repository, error) {
@@ -51,8 +50,7 @@ func gitCommit(worktree *git.Worktree, file string) (err error) {
 		return
 	}
 
-  val := createGitMessage("commit")
-
+	val := createGitMessage("commit")
 
 	fmt.Println("Commiting changes")
 	worktree.Commit(fmt.Sprintf("GitOps: Update %s\n%s", file, val), &git.CommitOptions{
@@ -74,31 +72,30 @@ func gitPush(repo *git.Repository, auth transport.AuthMethod) (err error) {
 	return
 }
 
-
 func createGitMessage(gitAction string) (pullRequestMessage string) {
-  val,exists:= os.LookupEnv("GIT_URL")
-  if exists {
-    source := strings.Split(strings.SplitN(val, "/", 4)[3], ".")
-    message := "This " + gitAction + " was automatically generated from the pipeline of the repo " + source[0] + "\n\n"
+	val, exists := os.LookupEnv("GIT_URL")
+	if exists {
+		source := strings.Split(strings.SplitN(val, "/", 4)[3], ".")
+		message := "This " + gitAction + " was automatically generated from the pipeline of the repo " + source[0] + "\n\n"
 
-    gitAuth := &http.BasicAuth{
-      Username: os.Getenv("GITOPS_GIT_USERNAME"),
-      Password: os.Getenv("GITOPS_GIT_PASSWORD"),
-    }
+		gitAuth := &http.BasicAuth{
+			Username: os.Getenv("GITOPS_GIT_USERNAME"),
+			Password: os.Getenv("GITOPS_GIT_PASSWORD"),
+		}
 
-    sourceRepo, err := gitClone(val, gitAuth, "/home/jenkins/tempSourceRepo/")
-    CheckIfError(err)
+		sourceRepo, err := gitClone(val, gitAuth, "/home/jenkins/tempSourceRepo/")
+		CheckIfError(err)
 
-    ref, err := sourceRepo.Head()
-    CheckIfError(err)
+		ref, err := sourceRepo.Head()
+		CheckIfError(err)
 
-    cIter, err := sourceRepo.Log(&git.LogOptions{From: ref.Hash()})
-    CheckIfError(err)
+		cIter, err := sourceRepo.Log(&git.LogOptions{From: ref.Hash()})
+		CheckIfError(err)
 
-    os.RemoveAll("/home/jenkins/tempSourceRepo/")
+		os.RemoveAll("/home/jenkins/tempSourceRepo/")
 
-    c, err := cIter.Next()
-    return message + c.String()
-  }
-  return "This " + gitAction + " was automatically generated https://github.com/liatrio/builder-images/tree/master/builder-image-gitops"
+		c, err := cIter.Next()
+		return message + c.String()
+	}
+	return "This " + gitAction + " was automatically generated https://github.com/liatrio/builder-images/tree/master/builder-image-gitops"
 }

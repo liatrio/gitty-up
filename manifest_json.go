@@ -27,7 +27,7 @@ func (m *manifestJSON) open(file string) (err error) {
 	for {
 		err := decoder.Decode(&m.data)
 		if err == io.EOF {
-			break;
+			break
 		}
 		if err != nil {
 			return fmt.Errorf("Error reading JSON file: %s", err)
@@ -37,7 +37,7 @@ func (m *manifestJSON) open(file string) (err error) {
 	return
 }
 
-func (m *manifestJSON) setValue(path []interface{}, value interface{}) (error) {
+func (m *manifestJSON) setValue(path []interface{}, value interface{}) error {
 	fmt.Printf("Setting value %v: %v\n", path, value)
 	return walk(&m.data, path, value)
 }
@@ -52,7 +52,7 @@ func (m *manifestJSON) save() (err error) {
 	encoder := json.NewEncoder(f)
 
 	encoder.SetIndent("", "  ")
-	err = encoder.Encode(m.data);
+	err = encoder.Encode(m.data)
 	if err != nil {
 		return fmt.Errorf("Error encoding JSON to file: %s", err)
 	}
@@ -60,12 +60,12 @@ func (m *manifestJSON) save() (err error) {
 	return
 }
 
-func walk(pos *interface{}, path[]interface{}, value interface{}) error {
+func walk(pos *interface{}, path []interface{}, value interface{}) error {
 	switch reflect.TypeOf(*pos).Kind() {
 	case reflect.Map:
 		for k, v := range (*pos).(map[string]interface{}) {
 			if k == path[0] {
-				if (len(path) == 1) {
+				if len(path) == 1 {
 					(*pos).(map[string]interface{})[k] = value
 					fmt.Printf("Changed value %s -> %s\n", v, value)
 					return nil

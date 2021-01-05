@@ -60,11 +60,23 @@ func usage(message string) {
 	os.Exit(1)
 }
 
+func defaultEnvString(name string, value string) string {
+	if env, exists := os.LookupEnv(name); exists {
+		return env
+	}
+	return value
+}
+
 func main() {
 	gitURL := flag.String(
 		"gitUrl",
 		os.Getenv("GITOPS_GIT_URL"),
 		"URL of git repository. Can also use GITOPS_GIT_URL environment variable")
+	gitBaseBranch := flag.String(
+		"gitBaseBranch",
+		defaultEnvString("GITOPS_GIT_BASE_BRANCH", "master"),
+		"Base branch of git repo (i.e. master, main)",
+	)
 	gitUsername := flag.String(
 		"gitUsername",
 		os.Getenv("GITOPS_GIT_USERNAME"),
@@ -159,7 +171,7 @@ func main() {
 		pathParts := strings.Split(strings.TrimSuffix(gitURLParts.Path, ".git"), "/")
 
 		if *dryrun == false {
-			pullRequest, err := githubPullRequest(tokenClient, pathParts[1], pathParts[2], branch)
+			pullRequest, err := githubPullRequest(tokenClient, pathParts[1], pathParts[2], *gitBaseBranch, branch)
 			CheckIfError(err)
 
 			fmt.Printf("Pull Request created: %s\n", pullRequest.GetHTMLURL())
